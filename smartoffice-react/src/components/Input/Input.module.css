@@ -1,0 +1,24 @@
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.formGroup label {
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    transition: .3s;
+    font-size: 14px;
+}
+
+.input:focus {
+    border-color: #2563eb;
+}
