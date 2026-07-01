@@ -59,9 +59,13 @@ function UserForm({ user, departments }) {
       [name]: value,
     }));
   }
+async function handleSubmit(e) {
+  e.preventDefault();
 
+  console.log(formData);
+}
   return (
-    <form className={styles.form}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <Input
         name="fullName"
         placeholder="نام کامل"
