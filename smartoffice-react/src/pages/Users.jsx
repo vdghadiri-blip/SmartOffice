@@ -1,18 +1,3 @@
-/**
- ************************************************
- *
- * Users.jsx
- *
- * مسئول:
- *
- *  - دریافت کاربران
- *  - دریافت دپارتمان‌ها
- *  - نمایش جدول
- *  - مدیریت Modal
- *
- ************************************************
- */
-
 import { useEffect, useState } from "react";
 
 import userService from "../services/userService";
@@ -21,118 +6,205 @@ import departmentService from "../services/departmentService";
 import Table from "../components/Table/Table";
 import Modal from "../components/Modal/Modal";
 import UserForm from "../components/UserForm/UserForm";
+import Button from "../components/Button/Button";
 
 import styles from "./Users.module.css";
 
 function Users() {
-  /**********************************************
-   * State
-   **********************************************/
 
-  const [users, setUsers] = useState([]);
-  const [departments, setDepartments] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [departments, setDepartments] = useState([]);
 
-  const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-  const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
-  /**********************************************
-   * ستون‌های جدول
-   **********************************************/
+    const columns = [
 
-  const columns = [
-    {
-      field: "username",
-      title: "نام کاربری",
-    },
-    {
-      field: "fullName",
-      title: "نام",
-    },
-    {
-      field: "role",
-      title: "نقش",
-    },
-    {
-      field: "departmentId",
-      title: "دپارتمان",
+        {
+            field: "username",
+            title: "نام کاربری",
+        },
 
-      render: (row) => {
-        const department = departments.find((d) => d.id === row.departmentId);
+        {
+            field: "fullName",
+            title: "نام",
+        },
 
-        return department ? department.name : "-";
-      },
-    },
-  ];
+        {
+            field: "role",
+            title: "نقش",
+        },
 
-  /**********************************************
-   * بارگذاری اولیه صفحه
-   **********************************************/
+        {
+            field: "departmentId",
+            title: "دپارتمان",
 
-  useEffect(() => {
-    loadUsers();
-    loadDepartments();
-  }, []);
+            render: (row) => {
 
-  /**********************************************
-   * دریافت کاربران
-   **********************************************/
+                const department =
+                    departments.find(
+                        d => d.id === row.departmentId
+                    );
 
-  async function loadUsers() {
-    try {
-      const data = await userService.getAll();
+                return department
+                    ? department.name
+                    : "-";
+            }
+        }
 
-      setUsers(data);
-    } catch (error) {
-      console.log(error);
+    ];
+
+
+    useEffect(() => {
+
+        loadUsers();
+        loadDepartments();
+
+    }, []);
+
+
+    async function loadUsers() {
+
+        try {
+
+            const data =
+                await userService.getAll();
+
+            setUsers(data);
+
+        }
+        catch (error) {
+
+            console.log(error);
+
+        }
+
     }
-  }
 
-  /**********************************************
-   * دریافت دپارتمان‌ها
-   **********************************************/
 
-  async function loadDepartments() {
-    try {
-      const data = await departmentService.getAll();
+    async function loadDepartments() {
 
-      setDepartments(data);
-    } catch (error) {
-      console.log(error);
+        try {
+
+            const data =
+                await departmentService.getAll();
+
+            setDepartments(data);
+
+        }
+        catch (error) {
+
+            console.log(error);
+
+        }
+
     }
-  }
 
-  /**********************************************
-   * باز کردن فرم ویرایش
-   **********************************************/
 
-  function handleEdit(user) {
-    setSelectedUser(user);
+    async function handleSave(formData) {
 
-    setShowModal(true);
-  }
+        try {
 
-  /**********************************************
-   * بستن مودال
-   **********************************************/
+            if (selectedUser) {
 
-  function closeModal() {
-    setShowModal(false);
+                await userService.update(
+                    selectedUser.id,
+                    formData
+                );
 
-    setSelectedUser(null);
-  }
+            }
+            else {
 
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>لیست کاربران</h1>
+                await userService.create(formData);
 
-      <Table columns={columns} data={users} onEdit={handleEdit} />
+            }
 
-      <Modal isOpen={showModal} title="ویرایش کاربر" onClose={closeModal}>
-        <UserForm user={selectedUser} departments={departments} />
-      </Modal>
-    </div>
-  );
+            await loadUsers();
+
+            closeModal();
+
+        }
+catch (error) {
+
+    console.log(error);
+
+    alert(error.response?.data || error.message);
+
+}
+
+    }
+
+
+    function handleEdit(user) {
+
+        setSelectedUser(user);
+
+        setShowModal(true);
+
+    }
+
+
+    function handleCreate() {
+
+        setSelectedUser(null);
+
+        setShowModal(true);
+
+    }
+
+
+    function closeModal() {
+
+        setShowModal(false);
+
+        setSelectedUser(null);
+
+    }
+
+
+    return (
+
+        <div className={styles.container}>
+
+            <h1 className={styles.title}>
+                لیست کاربران
+            </h1>
+
+            <Button
+                onClick={handleCreate}
+            >
+                کاربر جدید
+            </Button>
+
+            <Table
+                columns={columns}
+                data={users}
+                onEdit={handleEdit}
+            />
+
+            <Modal
+                isOpen={showModal}
+                title={
+                    selectedUser
+                        ? "ویرایش کاربر"
+                        : "کاربر جدید"
+                }
+                onClose={closeModal}
+            >
+
+                <UserForm
+                    user={selectedUser}
+                    departments={departments}
+                    onSave={handleSave}
+                />
+
+            </Modal>
+
+        </div>
+
+    );
+
 }
 
 export default Users;
