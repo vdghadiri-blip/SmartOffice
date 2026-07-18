@@ -1,16 +1,21 @@
 import styles from "./Header.module.css";
 import Button from "../Button/Button";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../features/auth/slice/authSlice";
 
 function Header() {
-  const username = localStorage.getItem("username");
 
-  const role = localStorage.getItem("role");
+const dispatch = useDispatch();
 
-  function logout() {
-    localStorage.clear();
+const { user } = useSelector((state) => state.auth);
 
-    window.location.href = "/";
-  }
+function handleLogout() {
+  dispatch(logout());
+
+  localStorage.clear();
+
+  window.location.href = "/";
+}
 
   return (
     <header className={styles.header}>
@@ -19,9 +24,9 @@ function Header() {
       </div>
 
       <div className={styles.left}>
-        <span>👤 {username}</span>
+        <span>👤 {user?.username}</span>
 
-        <span>({role})</span>
+        <span>({user?.role})</span>
 
         <Button variant="danger" onClick={logout}>
           خروج

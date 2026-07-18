@@ -4,7 +4,9 @@ import api from "../api/axios";
 
 import styles from "./Login.module.css";
 
-
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../features/auth/slice/authSlice";
 
 function Login(){
 
@@ -13,6 +15,8 @@ const [username,setUsername]=useState("");
 
 const [password,setPassword]=useState("");
 
+const navigate = useNavigate();
+const dispatch = useDispatch();
 
 
 
@@ -28,10 +32,18 @@ username,
 password
 
 });
+const data = response.data;
+dispatch(
+  login({
+    user: {
+      username: data.username,
+      role: data.role,
+    },
+    token: data.token,
+  }),
+);
 
 
-
-const data=response.data;
 
 
 
@@ -43,8 +55,7 @@ localStorage.setItem("role",data.role);
 
 
 
-window.location.href="/dashboard";
-
+navigate("/dashboard");
 
 
 }
