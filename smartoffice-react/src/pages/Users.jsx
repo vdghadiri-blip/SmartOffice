@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import userService from "../services/userService";
 import departmentService from "../services/departmentService";
 
 import Table from "../components/Table/Table";
@@ -10,201 +9,152 @@ import Button from "../components/Button/Button";
 
 import styles from "./Users.module.css";
 
+// اولین API واقعی با RTK Query
+import { useGetUsersQuery } from "../features/users/api/usersApi";
+
 function Users() {
+  /************************************************
+   *
+   * دریافت کاربران
+   *
+   * دیگر useEffect و loadUsers نداریم.
+   *
+   * RTK Query خودش:
+   *
+   * ✔ درخواست می‌فرستد
+   * ✔ Loading را مدیریت می‌کند
+   * ✔ Error را مدیریت می‌کند
+   * ✔ Cache نگه می‌دارد
+   *
+   ************************************************/
 
-    const [users, setUsers] = useState([]);
-    const [departments, setDepartments] = useState([]);
+  const { data: users = [], isLoading, error, refetch } = useGetUsersQuery();
 
-    const [selectedUser, setSelectedUser] = useState(null);
+  // فعلاً دپارتمان‌ها هنوز با روش قبلی هستند.
+  // بعداً آن‌ها را هم به RTK Query منتقل می‌کنیم.
+  const [departments, setDepartments] = useState([]);
 
-    const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-    const columns = [
+  const [showModal, setShowModal] = useState(false);
 
-        {
-            field: "username",
-            title: "نام کاربری",
-        },
+  const columns = [
+    {
+      field: "username",
+      title: "نام کاربری",
+    },
 
-        {
-            field: "fullName",
-            title: "نام",
-        },
+    {
+      field: "fullName",
+      title: "نام",
+    },
 
-        {
-            field: "role",
-            title: "نقش",
-        },
+    {
+      field: "role",
+      title: "نقش",
+    },
 
-        {
-            field: "departmentId",
-            title: "دپارتمان",
+    {
+      field: "departmentId",
+      title: "دپارتمان",
 
-            render: (row) => {
+      render: (row) => {
+        const department = departments.find((d) => d.id === row.departmentId);
 
-                const department =
-                    departments.find(
-                        d => d.id === row.departmentId
-                    );
+        return department ? department.name : "-";
+      },
+    },
+  ];
 
-                return department
-                    ? department.name
-                    : "-";
-            }
-        }
+  /************************************************
+   *
+   * فعلاً فقط دپارتمان‌ها با روش قدیمی دریافت می‌شوند.
+   *
+   * در مرحله بعد آن‌ها را هم به RTK Query منتقل می‌کنیم.
+   *
+   ************************************************/
 
-    ];
+  useState(() => {
+    loadDepartments();
+  });
 
+  async function loadDepartments() {
+    try {
+      const data = await departmentService.getAll();
 
-    useEffect(() => {
-
-        loadUsers();
-        loadDepartments();
-
-    }, []);
-
-
-    async function loadUsers() {
-
-        try {
-
-            const data =
-                await userService.getAll();
-
-            setUsers(data);
-
-        }
-        catch (error) {
-
-            console.log(error);
-
-        }
-
+      setDepartments(data);
+    } catch (error) {
+      console.log(error);
     }
+  }
 
+  async function handleSave(formData) {
+    try {
+      alert("در مرحله بعد Create و Update نیز با RTK Query انجام می‌شود.");
 
-    async function loadDepartments() {
+      refetch();
 
-        try {
-
-            const data =
-                await departmentService.getAll();
-
-            setDepartments(data);
-
-        }
-        catch (error) {
-
-            console.log(error);
-
-        }
-
+      closeModal();
+    } catch (error) {
+      console.log(error);
     }
+  }
 
+  function handleEdit(user) {
+    setSelectedUser(user);
 
-    async function handleSave(formData) {
+    setShowModal(true);
+  }
 
-        try {
+  function handleCreate() {
+    setSelectedUser(null);
 
-            if (selectedUser) {
+    setShowModal(true);
+  }
 
-                await userService.update(
-                    selectedUser.id,
-                    formData
-                );
+  function closeModal() {
+    setShowModal(false);
 
-            }
-            else {
+    setSelectedUser(null);
+  }
 
-                await userService.create(formData);
+  /************************************************
+   *
+   * Loading
+   *
+   ************************************************/
 
-            }
+  if (isLoading) return <h2>در حال دریافت کاربران...</h2>;
 
-            await loadUsers();
+  /************************************************
+   *
+   * Error
+   *
+   ************************************************/
 
-            closeModal();
+  if (error) return <h2>خطا در دریافت کاربران</h2>;
 
-        }
-catch (error) {
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>لیست کاربران</h1>
 
-    console.log(error);
+      <Button onClick={handleCreate}>کاربر جدید</Button>
 
-    alert(error.response?.data || error.message);
+      <Table columns={columns} data={users} onEdit={handleEdit} />
 
-}
-
-    }
-
-
-    function handleEdit(user) {
-
-        setSelectedUser(user);
-
-        setShowModal(true);
-
-    }
-
-
-    function handleCreate() {
-
-        setSelectedUser(null);
-
-        setShowModal(true);
-
-    }
-
-
-    function closeModal() {
-
-        setShowModal(false);
-
-        setSelectedUser(null);
-
-    }
-
-
-    return (
-
-        <div className={styles.container}>
-
-            <h1 className={styles.title}>
-                لیست کاربران
-            </h1>
-
-            <Button
-                onClick={handleCreate}
-            >
-                کاربر جدید
-            </Button>
-
-            <Table
-                columns={columns}
-                data={users}
-                onEdit={handleEdit}
-            />
-
-            <Modal
-                isOpen={showModal}
-                title={
-                    selectedUser
-                        ? "ویرایش کاربر"
-                        : "کاربر جدید"
-                }
-                onClose={closeModal}
-            >
-
-                <UserForm
-                    user={selectedUser}
-                    departments={departments}
-                    onSave={handleSave}
-                />
-
-            </Modal>
-
-        </div>
-
-    );
-
+      <Modal
+        isOpen={showModal}
+        title={selectedUser ? "ویرایش کاربر" : "کاربر جدید"}
+        onClose={closeModal}
+      >
+        <UserForm
+          user={selectedUser}
+          departments={departments}
+          onSave={handleSave}
+        />
+      </Modal>
+    </div>
+  );
 }
 
 export default Users;
