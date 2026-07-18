@@ -1,47 +1,61 @@
-/*************************************************
- *
- * store.js
- *
- * ساخت Redux Store پروژه
- *
- *************************************************/
+// ========================================================
+// Store اصلی برنامه
+// ========================================================
 
+// ساخت Store استاندارد Redux Toolkit
 import { configureStore } from "@reduxjs/toolkit";
 
+// Reducer مربوط به احراز هویت
 import authReducer from "../../features/auth/slice/authSlice";
 
+// API مرکزی RTK Query
 import { apiSlice } from "../api/apiSlice";
 
 export const store = configureStore({
 
     reducer: {
 
-        /*
-            اطلاعات احراز هویت
-        */
+        // State مربوط به احراز هویت
         auth: authReducer,
 
         /*
-            اطلاعات RTK Query
+        =======================================================
+        reducer مربوط به RTK Query
 
-            reducerPath برابر "api" است،
-            بنابراین این خط معادل زیر است:
+        reducerPath داخل apiSlice برابر "api" است.
 
-            api: apiSlice.reducer
+        بنابراین نتیجه State این شکلی می‌شود:
+
+        state = {
+            auth: { ... },
+            api: { ... }
+        }
+
+        این قسمت کش درخواست‌ها، Loading،
+        Error و Data را مدیریت می‌کند.
+        =======================================================
         */
         [apiSlice.reducerPath]: apiSlice.reducer,
+
     },
 
     /*
-        Middleware
+    =======================================================
+    Middleware مخصوص RTK Query
 
-        RTK Query برای Cache، Loading،
-        Error و Refresh خودکار از Middleware
-        استفاده می‌کند.
+    اگر این قسمت را اضافه نکنیم:
 
-        اگر این قسمت نباشد،
-        RTK Query درست کار نخواهد کرد.
+    ❌ Cache کار نمی‌کند.
+    ❌ Refetch انجام نمی‌شود.
+    ❌ Loading مدیریت نمی‌شود.
+    ❌ Invalidate Tagها کار نمی‌کنند.
+
+    بنابراین Middleware قلب RTK Query است.
+    =======================================================
     */
+
     middleware: (getDefaultMiddleware) =>
+
         getDefaultMiddleware().concat(apiSlice.middleware),
+
 });
