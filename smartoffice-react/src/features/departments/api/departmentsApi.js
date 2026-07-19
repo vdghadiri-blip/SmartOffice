@@ -1,58 +1,90 @@
-/************************************************
- *
- * departmentsApi.js
- *
- * تمام API های مربوط به دپارتمان‌ها
- *
- ************************************************/
-
 import { apiSlice } from "../../../app/api/apiSlice";
+
 
 export const departmentsApi = apiSlice.injectEndpoints({
 
     endpoints: (builder) => ({
 
-        /********************************************
-         *
-         * دریافت لیست دپارتمان‌ها
-         *
-         ********************************************/
+        // دریافت لیست
         getDepartments: builder.query({
-
-            /*
-             *
-             * درخواست GET
-             *
-             * GET /Departments
-             *
-             */
 
             query: () => "/Departments",
 
-            /*
-             *
-             * کش دپارتمان‌ها
-             *
-             */
-
-            providesTags: ["Departments"],
+            providesTags: ["Departments"]
 
         }),
 
-    }),
+
+
+        // ساخت
+        createDepartment: builder.mutation({
+
+            query: (department) => ({
+
+                url: "/Departments",
+
+                method: "POST",
+
+                body: department
+
+            }),
+
+            invalidatesTags: ["Departments"]
+
+        }),
+
+
+
+
+        // ویرایش
+        updateDepartment: builder.mutation({
+
+            query: ({ id, department }) => ({
+
+                url: `/Departments/${id}`,
+
+                method: "PUT",
+
+                body: department
+
+            }),
+
+            invalidatesTags: ["Departments"]
+
+        }),
+
+
+
+
+        // حذف
+        deleteDepartment: builder.mutation({
+
+            query: (id) => ({
+
+                url: `/Departments/${id}`,
+
+                method: "DELETE"
+
+            }),
+
+            invalidatesTags: ["Departments"]
+
+        })
+
+    })
 
 });
 
-/*
- *
- * RTK Query به صورت خودکار این Hook را می‌سازد.
- *
- * useGetDepartmentsQuery()
- *
- */
+
 
 export const {
 
     useGetDepartmentsQuery,
+
+    useCreateDepartmentMutation,
+
+    useUpdateDepartmentMutation,
+
+    useDeleteDepartmentMutation
 
 } = departmentsApi;

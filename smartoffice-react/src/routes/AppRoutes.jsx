@@ -1,54 +1,71 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+
 import Layout from "../layouts/Layout";
 import PrivateRoute from "./PrivateRoute";
+
 import Users from "../pages/Users";
+import Departments from "../pages/Departments";
 
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* 
+                مسیر پیش فرض
 
-function AppRoutes(){
+                وقتی کاربر وارد:
+                /
+                می‌شود
 
+                به داشبورد منتقل می‌شود
+            */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-return(
+      {/* 
+                صفحه ورود
 
-<Routes>
+                این صفحه Layout ندارد
+                چون هنوز کاربر لاگین نکرده
+            */}
+      <Route path="/login" element={<Login />} />
 
+      {/* 
+                تمام صفحات داخل این Route:
 
-<Route 
-path="/" 
-element={<Login/>}
-/>
+                ✔ نیاز به لاگین دارند
+                ✔ Layout مشترک دارند
+                ✔ Sidebar و Header دارند
+            */}
+      <Route
+        element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }
+      >
+        {/* داشبورد */}
+        <Route path="/dashboard" element={<Dashboard />} />
 
+        {/* کاربران */}
+        <Route path="/users" element={<Users />} />
 
+        {/* دپارتمان‌ها */}
+        <Route path="/departments" element={<Departments />} />
+      </Route>
 
-<Route 
-element={
-<PrivateRoute>
-<Layout/>
-</PrivateRoute>
+      {/* 
+                اگر آدرس اشتباه وارد شد
+
+                مثلا:
+                /abc
+
+                برگرد به داشبورد
+            */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
 }
->
-
-
-<Route 
-path="/dashboard" 
-element={<Dashboard/>}
-/>
-
-<Route 
-path="/users"
-element={<Users/>}
-/>
-</Route>
-
-
-
-</Routes>
-
-)
-
-
-}
-
 
 export default AppRoutes;

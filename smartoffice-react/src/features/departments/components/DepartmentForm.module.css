@@ -1,0 +1,16 @@
+.form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+}
+
+
+.actions {
+
+    margin-top: 20px;
+
+}

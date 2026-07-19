@@ -1,6 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { FaHome, FaUsers, FaEnvelope, FaCog } from "react-icons/fa";
-
+import { FaHome, FaUsers, FaEnvelope, FaCog, FaBuilding } from "react-icons/fa";
 import Header from "../components/Header/Header";
 import styles from "./Layout.module.css";
 
@@ -25,6 +24,11 @@ function Layout() {
       title: "تنظیمات",
       path: "/settings",
       icon: <FaCog />,
+    },
+    {
+      title: "دپارتمان‌ها",
+      path: "/departments",
+      icon: <FaBuilding />,
     },
   ];
 
