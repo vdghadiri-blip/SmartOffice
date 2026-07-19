@@ -1,29 +1,82 @@
-import { apiSlice } from "../../../app/api/apiSlice";
+/************************************************
+ *
+ * usersApi.js
+ *
+ * تمام API های مربوط به کاربران
+ *
+ ************************************************/
 
-/*
-=========================================================
-Users API
----------------------------------------------------------
-تمام درخواست‌های مربوط به کاربران در این فایل قرار می‌گیرد.
-از این به بعد به جای userService.js کم‌کم از RTK Query
-استفاده خواهیم کرد.
-=========================================================
-*/
+import { apiSlice } from "../../../app/api/apiSlice";
 
 export const usersApi = apiSlice.injectEndpoints({
 
     endpoints: (builder) => ({
 
-        /*
-        =========================================================
-        دریافت لیست کاربران
-        =========================================================
-        */
-
+        /********************************************
+         * دریافت لیست کاربران
+         ********************************************/
         getUsers: builder.query({
 
-            // آدرس API
             query: () => "/Users",
+
+            // این Query به تگ Users وابسته است.
+            providesTags: ["Users"],
+
+        }),
+
+        /********************************************
+         * ایجاد کاربر
+         ********************************************/
+        createUser: builder.mutation({
+
+            query: (user) => ({
+
+                url: "/Users",
+
+                method: "POST",
+
+                body: user,
+
+            }),
+
+            // بعد از ثبت، کش کاربران باطل می‌شود
+            invalidatesTags: ["Users"],
+
+        }),
+
+        /********************************************
+         * ویرایش کاربر
+         ********************************************/
+        updateUser: builder.mutation({
+
+            query: ({ id, user }) => ({
+
+                url: `/Users/${id}`,
+
+                method: "PUT",
+
+                body: user,
+
+            }),
+
+            invalidatesTags: ["Users"],
+
+        }),
+
+        /********************************************
+         * حذف کاربر
+         ********************************************/
+        deleteUser: builder.mutation({
+
+            query: (id) => ({
+
+                url: `/Users/${id}`,
+
+                method: "DELETE",
+
+            }),
+
+            invalidatesTags: ["Users"],
 
         }),
 
@@ -31,7 +84,14 @@ export const usersApi = apiSlice.injectEndpoints({
 
 });
 
-// هوک آماده‌ای که RTK Query برای React می‌سازد
 export const {
+
     useGetUsersQuery,
+
+    useCreateUserMutation,
+
+    useUpdateUserMutation,
+
+    useDeleteUserMutation,
+
 } = usersApi;

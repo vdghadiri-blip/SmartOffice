@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import departmentService from "../services/departmentService";
 
 import Table from "../components/Table/Table";
@@ -10,8 +9,12 @@ import Button from "../components/Button/Button";
 import styles from "./Users.module.css";
 
 // اولین API واقعی با RTK Query
-import { useGetUsersQuery } from "../features/users/api/usersApi";
-
+import {
+  useGetUsersQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from "../features/users/api/usersApi";
 function Users() {
   /************************************************
    *
@@ -29,9 +32,17 @@ function Users() {
    ************************************************/
 
   const { data: users = [], isLoading, error, refetch } = useGetUsersQuery();
+  // هوک ثبت کاربر
+  const [createUser] = useCreateUserMutation();
 
+  // هوک ویرایش کاربر
+  const [updateUser] = useUpdateUserMutation();
   // فعلاً دپارتمان‌ها هنوز با روش قبلی هستند.
   // بعداً آن‌ها را هم به RTK Query منتقل می‌کنیم.
+
+  // هوک حذف کاربر
+  const [deleteUser] = useDeleteUserMutation();
+
   const [departments, setDepartments] = useState([]);
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -74,9 +85,9 @@ function Users() {
    *
    ************************************************/
 
-  useState(() => {
+  useEffect(() => {
     loadDepartments();
-  });
+  }, []);
 
   async function loadDepartments() {
     try {
@@ -88,15 +99,50 @@ function Users() {
     }
   }
 
+  /************************************************
+   *
+   * ثبت یا ویرایش کاربر
+   *
+   ************************************************/
   async function handleSave(formData) {
     try {
-      alert("در مرحله بعد Create و Update نیز با RTK Query انجام می‌شود.");
+      // اگر کاربری انتخاب شده باشد یعنی در حال ویرایش هستیم
+      if (selectedUser) {
+        await updateUser({
+          id: selectedUser.id,
+          user: formData,
+        }).unwrap();
+      }
+      // در غیر این صورت کاربر جدید ایجاد می‌کنیم
+      else {
+        await createUser(formData).unwrap();
+      }
 
-      refetch();
-
+      // بستن پنجره
       closeModal();
     } catch (error) {
       console.log(error);
+
+      alert(error?.data || "خطا در ذخیره کاربر");
+    }
+  }
+
+  /************************************************
+   *
+   * حذف کاربر
+   *
+   ************************************************/
+  async function handleDelete(user) {
+    // گرفتن تأیید از کاربر
+    if (!window.confirm(`آیا از حذف ${user.fullName} مطمئن هستید؟`)) return;
+
+    try {
+      // ارسال درخواست حذف
+      await deleteUser(user.id).unwrap();
+    } catch (error) {
+      console.log(error);
+
+      alert("خطا در حذف کاربر");
     }
   }
 
@@ -134,13 +180,19 @@ function Users() {
 
   if (error) return <h2>خطا در دریافت کاربران</h2>;
 
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>لیست کاربران</h1>
 
       <Button onClick={handleCreate}>کاربر جدید</Button>
 
-      <Table columns={columns} data={users} onEdit={handleEdit} />
+      <Table
+        columns={columns}
+        data={users}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       <Modal
         isOpen={showModal}
@@ -158,3 +210,4 @@ function Users() {
 }
 
 export default Users;
+ 
