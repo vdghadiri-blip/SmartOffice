@@ -35,13 +35,11 @@ const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ث
 
   // هوک ویرایش کاربر
   const [updateUser] = useUpdateUserMutation();
-  // فعلاً دپارتمان‌ها هنوز با روش قبلی هستند.
-  // بعداً آن‌ها را هم به RTK Query منتقل می‌کنیم.
 
   // هوک حذف کاربر
   const [deleteUser] = useDeleteUserMutation();
 
-const { data: departments = [] } = useGetDepartmentsQuery();
+  const { data: departments = [] } = useGetDepartmentsQuery();
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -74,15 +72,6 @@ const { data: departments = [] } = useGetDepartmentsQuery();
     },
   ];
 
-  /************************************************
-   *
-   * فعلاً فقط دپارتمان‌ها با روش قدیمی دریافت می‌شوند.
-   *
-   * در مرحله بعد آن‌ها را هم به RTK Query منتقل می‌کنیم.
-   *
-   ************************************************/
-
-  
   /************************************************
    *
    * ثبت یا ویرایش کاربر

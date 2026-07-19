@@ -1,66 +1,40 @@
-import { useEffect, useState } from "react";
 import { FaUsers, FaEnvelope, FaBuilding } from "react-icons/fa";
 import Table from "../components/Table/Table";
-import dashboardService from "../services/dashboardService";
+import {
+  useGetDashboardStatsQuery,
+  useGetRecentLettersQuery,
+} from "../features/dashboard/api/dashboardApi";
 
 import Card from "../components/Card/Card";
 
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
-  const [stats, setStats] = useState({
-    users: 0,
-    letters: 0,
-    departments: 0,
-  });
-  const [recentLetters, setRecentLetters] = useState([]);
+  const { data: stats = { users: 0, letters: 0, departments: 0 } } =
+    useGetDashboardStatsQuery();
 
-  useEffect(() => {
-    loadStats();
+  const { data: recentLetters = [] } = useGetRecentLettersQuery();
 
-    loadRecentLetters();
-  }, []);
+  const columns = [
+    {
+      field: "letterNumber",
+      title: "شماره نامه",
+    },
+    {
+      field: "subject",
+      title: "موضوع",
+    },
+    {
+      field: "senderUserId",
+      title: "فرستنده",
+    },
+    {
+      field: "createdAt",
+      title: "تاریخ",
 
-  async function loadStats() {
-    try {
-      const data = await dashboardService.getStats();
-
-      setStats(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-// پنج نامه آخر
-  async function loadRecentLetters() {
-    try {
-      const data = await dashboardService.getRecentLetters();
-
-      setRecentLetters(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-console.log(recentLetters);
-const columns = [
-  {
-    field: "letterNumber",
-    title: "شماره نامه",
-  },
-  {
-    field: "subject",
-    title: "موضوع",
-  },
-  {
-    field: "senderUserId",
-    title: "فرستنده",
-  },
-  {
-    field: "createdAt",
-    title: "تاریخ",
-
-    render: (row) => new Date(row.createdAt).toLocaleDateString("fa-IR"),
-  },
-];
+      render: (row) => new Date(row.createdAt).toLocaleDateString("fa-IR"),
+    },
+  ];
   return (
     <div className={styles.container}>
       <Card>

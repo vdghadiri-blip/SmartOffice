@@ -45,7 +45,8 @@ export const apiSlice = createApi({
 
     }),
 
-    // فعلاً خالی
+    tagTypes: ["Users", "Departments", "Dashboard", "Letters"],
+
     endpoints: () => ({}),
 
 });
