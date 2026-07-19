@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import departmentService from "../services/departmentService";
-
+import {  useState } from "react";
+import { useGetDepartmentsQuery } from "../features/departments/api/departmentsApi";
 import Table from "../components/Table/Table";
 import Modal from "../components/Modal/Modal";
 import UserForm from "../components/UserForm/UserForm";
@@ -31,8 +30,7 @@ function Users() {
    *
    ************************************************/
 
-  const { data: users = [], isLoading, error, refetch } = useGetUsersQuery();
-  // هوک ثبت کاربر
+const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ثبت کاربر
   const [createUser] = useCreateUserMutation();
 
   // هوک ویرایش کاربر
@@ -43,8 +41,7 @@ function Users() {
   // هوک حذف کاربر
   const [deleteUser] = useDeleteUserMutation();
 
-  const [departments, setDepartments] = useState([]);
-
+const { data: departments = [] } = useGetDepartmentsQuery();
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -85,20 +82,7 @@ function Users() {
    *
    ************************************************/
 
-  useEffect(() => {
-    loadDepartments();
-  }, []);
-
-  async function loadDepartments() {
-    try {
-      const data = await departmentService.getAll();
-
-      setDepartments(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
+  
   /************************************************
    *
    * ثبت یا ویرایش کاربر
