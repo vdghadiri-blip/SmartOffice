@@ -7,12 +7,11 @@ namespace SmartOffice.API.Services
     public class MongoDbService
     {
         private readonly IMongoCollection<User> _users;
-
         private readonly IMongoCollection<Letter> _letters;
+        private readonly IMongoCollection<Department> _departments;
 
         private readonly PasswordService _password;
 
-        private readonly IMongoCollection<Department> _departments;
         public MongoDbService(PasswordService password)
         {
             _password = password;
@@ -23,18 +22,16 @@ namespace SmartOffice.API.Services
             var database = client.GetDatabase(
                 "SmartOfficeDB");
 
-            _users = database.GetCollection<User>(
-                "Users");
+            _users = database.GetCollection<User>("Users");
 
-            _letters = database.GetCollection<Letter>(
-                "Letters");
+            _letters = database.GetCollection<Letter>("Letters");
 
             _departments = database.GetCollection<Department>("Departments");
         }
 
-        //========================
+        //=========================================
         // Users
-        //========================
+        //=========================================
 
         public List<User> GetUsers()
         {
@@ -45,21 +42,51 @@ namespace SmartOffice.API.Services
 
         public void CreateUser(User user)
         {
-            user.Id = ObjectId
-                .GenerateNewId()
-                .ToString();
+            // تولید شناسه جدید
+            user.Id = ObjectId.GenerateNewId().ToString();
 
+            // هش کردن رمز
             user.PasswordHash =
-                _password.HashPassword(
-                    user.PasswordHash!);
+                _password.HashPassword(user.Password!);
+
+            // رمز خام ذخیره نشود
+            user.Password = null;
 
             _users.InsertOne(user);
         }
 
-        public void UpdateUser(
-            string id,
-            User user)
+        public void UpdateUser(string id, User user)
         {
+            // -------------------------------
+            // گرفتن اطلاعات قبلی کاربر
+            // -------------------------------
+            var oldUser = _users.Find(x => x.Id == id).FirstOrDefault();
+
+            if (oldUser == null)
+                return;
+
+            // -------------------------------
+            // شناسه نباید تغییر کند
+            // -------------------------------
+            user.Id = id;
+
+            // -------------------------------
+            // اگر رمز وارد نشده باشد
+            // رمز قبلی حفظ شود
+            // -------------------------------
+            if (string.IsNullOrWhiteSpace(user.Password))
+            {
+                user.PasswordHash = oldUser.PasswordHash;
+            }
+            else
+            {
+                user.PasswordHash =
+                    _password.HashPassword(user.Password);
+            }
+
+            // رمز خام در دیتابیس ذخیره نشود
+            user.Password = null;
+
             _users.ReplaceOne(
                 x => x.Id == id,
                 user);
@@ -71,17 +98,16 @@ namespace SmartOffice.API.Services
                 x => x.Id == id);
         }
 
-        public List<User> GetUsersByDepartment(
-            string departmentId)
+        public List<User> GetUsersByDepartment(string departmentId)
         {
             return _users
                 .Find(x => x.DepartmentId == departmentId)
                 .ToList();
         }
 
-        //========================
+        //=========================================
         // Letters
-        //========================
+        //=========================================
 
         public List<Letter> GetLetters()
         {
@@ -90,9 +116,10 @@ namespace SmartOffice.API.Services
                 .ToList();
         }
 
-        //========================
-        // Department
-        //========================
+        //=========================================
+        // Departments
+        //=========================================
+
         public List<Department> GetDepartments()
         {
             return _departments
@@ -100,16 +127,17 @@ namespace SmartOffice.API.Services
                 .ToList();
         }
 
-        //گرفتن 5 نامه آخر
+        //=========================================
+        // آخرین 5 نامه
+        //=========================================
+
         public List<Letter> GetRecentLetters()
         {
-
             return _letters
                 .Find(x => true)
                 .SortByDescending(x => x.CreatedAt)
                 .Limit(5)
                 .ToList();
-
         }
     }
 }

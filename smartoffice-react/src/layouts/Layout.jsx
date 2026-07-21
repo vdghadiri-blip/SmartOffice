@@ -16,19 +16,20 @@ function Layout() {
       icon: <FaUsers />,
     },
     {
+      title: "دپارتمان‌ها",
+      path: "/departments",
+      icon: <FaBuilding />,
+    },
+    {
       title: "نامه‌ها",
       path: "/letters",
       icon: <FaEnvelope />,
     },
+
     {
       title: "تنظیمات",
       path: "/settings",
       icon: <FaCog />,
-    },
-    {
-      title: "دپارتمان‌ها",
-      path: "/departments",
-      icon: <FaBuilding />,
     },
   ];
 

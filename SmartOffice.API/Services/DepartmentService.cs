@@ -17,22 +17,28 @@ namespace SmartOffice.API.Services
         {
 
             var client =
-                new MongoClient("mongodb://localhost:27017");
+                new MongoClient(
+                    "mongodb://localhost:27017"
+                );
 
 
             var database =
-                client.GetDatabase("SmartOfficeDB");
+                client.GetDatabase(
+                    "SmartOfficeDB"
+                );
 
 
             _departments =
-                database.GetCollection<Department>("Departments");
+                database.GetCollection<Department>(
+                    "Departments"
+                );
 
         }
 
 
 
 
-
+        // گرفتن لیست دپارتمان‌ها
         public List<Department> GetDepartments()
         {
 
@@ -45,16 +51,20 @@ namespace SmartOffice.API.Services
 
 
 
-
+        // ایجاد دپارتمان
         public void CreateDepartment(
             Department department)
         {
 
             department.Id =
-                ObjectId.GenerateNewId().ToString();
+                ObjectId
+                .GenerateNewId()
+                .ToString();
 
 
-            _departments.InsertOne(department);
+            _departments.InsertOne(
+                department
+            );
 
         }
 
@@ -62,6 +72,28 @@ namespace SmartOffice.API.Services
 
 
 
+        // ویرایش دپارتمان
+        public void UpdateDepartment(
+            string id,
+            Department department)
+        {
+
+
+            department.Id = id;
+
+
+            _departments.ReplaceOne(
+                x => x.Id == id,
+                department
+            );
+
+        }
+
+
+
+
+
+        // حذف دپارتمان
         public void DeleteDepartment(
             string id)
         {
@@ -71,8 +103,6 @@ namespace SmartOffice.API.Services
             );
 
         }
-
-
 
     }
 
