@@ -9,7 +9,7 @@ namespace SmartOffice.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
 
