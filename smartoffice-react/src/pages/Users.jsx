@@ -1,4 +1,5 @@
-import {  useState } from "react";
+import { useState } from "react";
+import { useGetRolesQuery } from "../features/roles/api/rolesApi";
 import { useGetDepartmentsQuery } from "../features/departments/api/departmentsApi";
 import Table from "../components/Table/Table";
 import Modal from "../components/Modal/Modal";
@@ -30,7 +31,7 @@ function Users() {
    *
    ************************************************/
 
-const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ثبت کاربر
+  const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ثبت کاربر
   const [createUser] = useCreateUserMutation();
 
   // هوک ویرایش کاربر
@@ -40,6 +41,7 @@ const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ث
   const [deleteUser] = useDeleteUserMutation();
 
   const { data: departments = [] } = useGetDepartmentsQuery();
+  const { data: roles = [] } = useGetRolesQuery();
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -175,6 +177,7 @@ const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ث
         <UserForm
           user={selectedUser}
           departments={departments}
+          roles={roles}
           onSave={handleSave}
         />
       </Modal>
@@ -183,4 +186,4 @@ const { data: users = [], isLoading, error } = useGetUsersQuery();  // هوک ث
 }
 
 export default Users;
- 
+

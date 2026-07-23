@@ -21,6 +21,7 @@ import styles from "./UserForm.module.css";
 function UserForm({
     user,
     departments,
+    roles,
     onSave
 }) {
 
@@ -133,12 +134,24 @@ function UserForm({
 
             )}
 
-            <Input
+            <Select
                 name="role"
-                placeholder="نقش"
                 value={formData.role}
                 onChange={handleChange}
-            />
+            >
+                <option value="">
+                    انتخاب نقش
+                </option>
+
+                {roles.map((role) => (
+                    <option
+                        key={role.id}
+                        value={role.name}
+                    >
+                        {role.name}
+                    </option>
+                ))}
+            </Select>
 
             <Select
                 name="departmentId"

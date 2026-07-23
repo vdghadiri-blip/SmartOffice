@@ -2,7 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { FaHome, FaUsers, FaEnvelope, FaCog, FaBuilding } from "react-icons/fa";
 import Header from "../components/Header/Header";
 import styles from "./Layout.module.css";
-
+import { FaUserShield } from "react-icons/fa";
 function Layout() {
   const menuItems = [
     {
@@ -15,6 +15,11 @@ function Layout() {
       path: "/users",
       icon: <FaUsers />,
     },
+    {
+    title: "نقش‌ها",
+    path: "/roles",
+    icon: <FaUserShield />,
+},
     {
       title: "دپارتمان‌ها",
       path: "/departments",

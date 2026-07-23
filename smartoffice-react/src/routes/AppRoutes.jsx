@@ -2,42 +2,29 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+import Users from "../pages/Users";
+import Departments from "../pages/Departments";
+import Roles from "../pages/Roles";
 
 import Layout from "../layouts/Layout";
 import PrivateRoute from "./PrivateRoute";
 
-import Users from "../pages/Users";
-import Departments from "../pages/Departments";
-
 function AppRoutes() {
   return (
     <Routes>
-      {/* 
-                مسیر پیش فرض
+      {/* مسیر پیش فرض */}
+      <Route
+        path="/"
+        element={<Navigate to="/dashboard" replace />}
+      />
 
-                وقتی کاربر وارد:
-                /
-                می‌شود
+      {/* صفحه ورود */}
+      <Route
+        path="/login"
+        element={<Login />}
+      />
 
-                به داشبورد منتقل می‌شود
-            */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
-      {/* 
-                صفحه ورود
-
-                این صفحه Layout ندارد
-                چون هنوز کاربر لاگین نکرده
-            */}
-      <Route path="/login" element={<Login />} />
-
-      {/* 
-                تمام صفحات داخل این Route:
-
-                ✔ نیاز به لاگین دارند
-                ✔ Layout مشترک دارند
-                ✔ Sidebar و Header دارند
-            */}
+      {/* صفحات محافظت شده */}
       <Route
         element={
           <PrivateRoute>
@@ -45,25 +32,32 @@ function AppRoutes() {
           </PrivateRoute>
         }
       >
-        {/* داشبورد */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
 
-        {/* کاربران */}
-        <Route path="/users" element={<Users />} />
+        <Route
+          path="/users"
+          element={<Users />}
+        />
 
-        {/* دپارتمان‌ها */}
-        <Route path="/departments" element={<Departments />} />
+        <Route
+          path="/roles"
+          element={<Roles />}
+        />
+
+        <Route
+          path="/departments"
+          element={<Departments />}
+        />
       </Route>
 
-      {/* 
-                اگر آدرس اشتباه وارد شد
-
-                مثلا:
-                /abc
-
-                برگرد به داشبورد
-            */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      {/* مسیرهای نامعتبر */}
+      <Route
+        path="*"
+        element={<Navigate to="/dashboard" replace />}
+      />
     </Routes>
   );
 }
