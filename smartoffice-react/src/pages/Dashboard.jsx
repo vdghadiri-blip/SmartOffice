@@ -60,11 +60,22 @@ function Dashboard() {
 
         <h1>{stats.departments}</h1>
       </Card>
-      <Card>
-        <h2>آخرین نامه‌ها</h2>
+     <div className={styles.recent}>
 
-        <Table columns={columns} data={recentLetters} />
-      </Card>
+<Card>
+
+<h2>
+آخرین نامه‌ها
+</h2>
+
+<Table 
+columns={columns}
+data={recentLetters}
+/>
+
+</Card>
+
+</div>
     </div>
   );
 }

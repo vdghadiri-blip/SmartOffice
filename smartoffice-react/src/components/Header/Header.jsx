@@ -5,18 +5,19 @@ import { logout } from "../../features/auth/slice/authSlice";
 
 function Header() {
 
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
-function handleLogout() {
-  dispatch(logout());
+  function handleLogout() {
 
-  localStorage.clear();
+    dispatch(logout());
 
-  window.location.href = "/";
-}
+    localStorage.removeItem("token");
 
+    window.location.href = "/login";
+
+  }
   return (
     <header className={styles.header}>
       <div className={styles.right}>
@@ -27,11 +28,11 @@ function handleLogout() {
         <span>👤 {user?.username}</span>
 
         <span>({user?.role})</span>
-        
 
-        <Button variant="danger" onClick={logout}>
+        <Button variant="danger" onClick={handleLogout}>
           خروج
         </Button>
+       
       </div>
     </header>
   );

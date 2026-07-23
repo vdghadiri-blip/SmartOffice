@@ -1,37 +1,51 @@
 .container {
 
-    padding: 30px;
+padding:30px;
 
-    display: grid;
+display:grid;
 
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+grid-template-columns:repeat(3,1fr);
 
-    gap: 20px;
+gap:20px;
 
 }
+
 
 .icon {
 
-    color: #2563eb;
+color:#2563eb;
 
-    margin-bottom: 15px;
+margin-bottom:15px;
 
 }
+
 
 .container h3 {
 
-    margin: 10px 0;
+margin:10px 0;
 
-    color: #475569;
+color:#475569;
 
 }
 
+
 .container h1 {
 
-    margin: 0;
+margin:0;
 
-    color: #0f172a;
+color:#0f172a;
 
-    font-size: 34px;
+font-size:34px;
+
+}
+
+
+/* کارت آخرین نامه ها */
+
+.recent {
+
+grid-column:1 / -1;
+
+margin-top:20px;
 
 }

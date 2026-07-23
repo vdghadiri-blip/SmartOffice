@@ -8,48 +8,29 @@
 
 import { apiSlice } from "../../../app/api/apiSlice";
 
+
 export const lettersApi = apiSlice.injectEndpoints({
 
     endpoints: (builder) => ({
 
+
         /********************************************
-         * دریافت لیست نامه‌ها
+         * دریافت همه نامه‌ها
          ********************************************/
         getLetters: builder.query({
 
             query: () => "/Letters",
 
-            providesTags: (result = []) => [
-                "Letters",
-                ...result.map(({ id }) => ({ type: "Letters", id })),
-            ],
-
-        }),
-
-        /********************************************
-         * دریافت یک نامه
-         ********************************************/
-        getLetter: builder.query({
-
-            query: (id) => `/Letters/read/${id}`,
-
-            providesTags: (result, error, id) => [{ type: "Letters", id }],
-
-        }),
-
-        /********************************************
-         * دریافت نامه‌های ارسالی
-         ********************************************/
-        getSentLetters: builder.query({
-
-            query: () => "/Letters/sent",
-
             providesTags: ["Letters"],
 
         }),
 
+
+
         /********************************************
-         * دریافت صندوق ورودی
+         * صندوق ورودی
+         *
+         * GET /api/Letters/inbox
          ********************************************/
         getInboxLetters: builder.query({
 
@@ -59,78 +40,65 @@ export const lettersApi = apiSlice.injectEndpoints({
 
         }),
 
+
+
         /********************************************
-         * دریافت نامه‌های دپارتمان
+         * نامه‌های ارسالی
+         *
+         * GET /api/Letters/sent
          ********************************************/
-        getDepartmentLetters: builder.query({
+        getSentLetters: builder.query({
 
-            query: (id) => `/Letters/department/${id}`,
+            query: () => "/Letters/sent",
 
-            providesTags: (result, error, id) => [
-                { type: "Letters", id: `DEPARTMENT_${id}` },
-            ],
+            providesTags: ["Letters"],
 
         }),
 
+
+
         /********************************************
-         * دریافت تاریخچه نامه
+         * تاریخچه نامه
+         *
+         * GET /api/Letters/history/{id}
          ********************************************/
         getLetterHistory: builder.query({
 
-            query: (letterId) => `/Letters/history/${letterId}`,
+            query: (id) =>
+                `/Letters/history/${id}`,
 
-            providesTags: (result, error, letterId) => [
-                { type: "Letters", id: `HISTORY_${letterId}` },
-            ],
+            providesTags: ["Letters"],
 
         }),
+
+
+
+        /********************************************
+         * خواندن نامه
+         *
+         * GET /api/Letters/read/{id}
+         ********************************************/
+        getLetter: builder.query({
+
+            query: (id) =>
+                `/Letters/read/${id}`,
+
+            providesTags: ["Letters"],
+
+        }),
+
+
 
         /********************************************
          * ارسال نامه
+         *
+         * POST /api/Letters/send
          ********************************************/
         sendLetter: builder.mutation({
 
-            query: (request) => ({
-
-                url: "/Letters/send",
-
-                method: "POST",
-
-                body: request,
-
-            }),
-
-            invalidatesTags: ["Letters", "Dashboard"],
-
-        }),
-
-        /********************************************
-         * ارجاع نامه
-         ********************************************/
-        forwardLetter: builder.mutation({
-
-            query: (request) => ({
-
-                url: "/Letters/forward",
-
-                method: "POST",
-
-                body: request,
-
-            }),
-
-            invalidatesTags: ["Letters"],
-
-        }),
-
-        /********************************************
-         * ایجاد نامه
-         ********************************************/
-        createLetter: builder.mutation({
-
             query: (letter) => ({
 
-                url: "/Letters",
+                url: "/Letters/send",
 
                 method: "POST",
 
@@ -138,53 +106,29 @@ export const lettersApi = apiSlice.injectEndpoints({
 
             }),
 
-            invalidatesTags: ["Letters", "Dashboard"],
-
-        }),
-
-        /********************************************
-         * به‌روزرسانی وضعیت نامه
-         ********************************************/
-        updateLetterStatus: builder.mutation({
-
-            query: (request) => ({
-
-                url: "/Letters/status",
-
-                method: "POST",
-
-                body: request,
-
-            }),
-
             invalidatesTags: ["Letters"],
 
         }),
 
+
     }),
 
+
 });
+
 
 export const {
 
     useGetLettersQuery,
 
-    useGetLetterQuery,
+    useGetInboxLettersQuery,
 
     useGetSentLettersQuery,
 
-    useGetInboxLettersQuery,
-
-    useGetDepartmentLettersQuery,
-
     useGetLetterHistoryQuery,
 
+    useGetLetterQuery,
+
     useSendLetterMutation,
-
-    useForwardLetterMutation,
-
-    useCreateLetterMutation,
-
-    useUpdateLetterStatusMutation,
 
 } = lettersApi;
