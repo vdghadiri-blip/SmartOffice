@@ -13,15 +13,31 @@ namespace SmartOffice.API.Controllers
     public class LettersController : ControllerBase
     {
 
-
         private readonly LetterService _service;
 
 
 
-        public LettersController(LetterService service)
+        public LettersController(
+            LetterService service)
+        {
+            _service = service;
+        }
+
+
+
+
+        //====================================================
+        // دریافت همه نامه ها
+        // GET api/letters
+        //====================================================
+
+        [HttpGet]
+        public IActionResult Get()
         {
 
-            _service = service;
+            return Ok(
+                _service.GetLetters()
+            );
 
         }
 
@@ -29,21 +45,52 @@ namespace SmartOffice.API.Controllers
 
 
 
-        [HttpPost("send")]
-        public IActionResult Send(SendLetterRequest request)
+
+
+        //====================================================
+        // ساخت نامه
+        // POST api/letters
+        //====================================================
+
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public IActionResult Create(
+            Letter letter)
         {
 
+            _service.CreateLetter(letter);
 
-            var sender = User.Identity?.Name;
+
+            return Ok(
+                "Letter created"
+            );
+
+        }
+
+
+
+
+
+
+
+
+        //====================================================
+        // ارسال نامه
+        // POST api/letters/send
+        //====================================================
+
+        [HttpPost("send")]
+        public IActionResult Send(
+            SendLetterRequest request)
+        {
+
+            var sender =
+                User.Identity?.Name;
 
 
 
             if (sender == null)
-            {
-
                 return Unauthorized();
-
-            }
 
 
 
@@ -54,74 +101,55 @@ namespace SmartOffice.API.Controllers
 
 
 
-            return Ok("Letter sent");
+            return Ok(
+                "Letter sent"
+            );
 
         }
-        //ارجاع گردش نامه
-        [HttpPost("forward")]
-        public IActionResult Forward(
-    ForwardLetterRequest request)
+
+
+
+
+
+
+
+
+        //====================================================
+        // Inbox
+        // GET api/letters/inbox
+        //====================================================
+
+        [HttpGet("inbox")]
+        public IActionResult Inbox()
         {
 
-
-            var sender =
+            var user =
                 User.Identity?.Name;
 
 
-            if (sender == null)
-            {
+
+            if (user == null)
                 return Unauthorized();
-            }
 
 
-            _service.ForwardLetter(
-                request,
-                sender
+
+            return Ok(
+                _service.GetInbox(user)
             );
 
-
-            return Ok("Letter forwarded");
-
-        }
-
-
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-
-            return Ok(_service.GetLetters());
-
         }
 
 
 
 
 
-        [HttpPost]
-        public IActionResult Create(Letter letter)
-        {
 
 
-            _service.CreateLetter(letter);
 
-
-            return Ok("Letter created");
-
-        }
-
-        [HttpGet("read/{id}")]
-        public IActionResult Read(string id)
-        {
-            var letter = _service.ReadLetter(id);
-
-            if (letter == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(letter);
-        }
+        //====================================================
+        // Sent
+        // GET api/letters/sent
+        //====================================================
 
         [HttpGet("sent")]
         public IActionResult Sent()
@@ -131,64 +159,114 @@ namespace SmartOffice.API.Controllers
                 User.Identity?.Name;
 
 
+
             if (user == null)
-            {
                 return Unauthorized();
-            }
+
 
 
             return Ok(
                 _service.GetSent(user)
             );
 
+        }
+
+
+
+
+
+
+
+
+        //====================================================
+        // خواندن نامه
+        // GET api/letters/read/{id}
+        //====================================================
+
+        [HttpGet("read/{id}")]
+        public IActionResult Read(
+            string id)
+        {
+
+            var letter =
+                _service.ReadLetter(id);
+
+
+
+            if (letter == null)
+                return NotFound();
+
+
+
+            return Ok(letter);
 
         }
 
 
-        [HttpGet("inbox")]
-        public IActionResult Inbox()
+
+
+
+
+
+
+        //====================================================
+        // ارجاع نامه
+        // POST api/letters/forward
+        //====================================================
+
+        [HttpPost("forward")]
+        public IActionResult Forward(
+            ForwardLetterRequest request)
         {
 
+            var sender =
+                User.Identity?.Name;
 
-            var userId = User.Identity?.Name;
 
 
-            if (userId == null)
-            {
+            if (sender == null)
                 return Unauthorized();
-            }
 
 
-            var letters = _service.GetInbox(userId);
+
+            _service.ForwardLetter(
+                request,
+                sender
+            );
 
 
-            return Ok(letters);
-
-        }
-        [HttpGet("department/{id}")]
-        public IActionResult DepartmentLetters(string id)
-        {
 
             return Ok(
-                _service.GetDepartmentLetters(id)
+                "Letter forwarded"
             );
 
         }
-        //رد یا تایید نامه
+
+
+
+
+
+
+
+
+        //====================================================
+        // تغییر وضعیت نامه
+        // POST api/letters/status
+        //====================================================
+
         [HttpPost("status")]
         public IActionResult UpdateStatus(
-    UpdateLetterStatusRequest request)
+            UpdateLetterStatusRequest request)
         {
-
 
             var user =
                 User.Identity?.Name;
 
 
+
             if (user == null)
-            {
                 return Unauthorized();
-            }
+
 
 
             _service.UpdateStatus(
@@ -197,16 +275,82 @@ namespace SmartOffice.API.Controllers
             );
 
 
-            return Ok("Status updated");
+
+            return Ok(
+                "Status updated"
+            );
 
         }
-        [HttpGet("history/{letterId}")]
-        public IActionResult History(
-    string letterId)
+
+
+
+
+
+
+
+
+        //====================================================
+        // نامه های دپارتمان
+        // GET api/letters/department/{id}
+        //====================================================
+
+        [HttpGet("department/{id}")]
+        public IActionResult Department(
+            string id)
         {
 
             return Ok(
-                _service.GetHistory(letterId)
+                _service.GetDepartmentLetters(id)
+            );
+
+        }
+
+
+
+
+
+
+
+
+        //====================================================
+        // تاریخچه نامه
+        // GET api/letters/history/{id}
+        //====================================================
+
+        [HttpGet("history/{id}")]
+        public IActionResult History(
+            string id)
+        {
+
+            return Ok(
+                _service.GetHistory(id)
+            );
+
+        }
+
+
+
+
+
+
+
+
+        //====================================================
+        // حذف نرم نامه
+        // DELETE api/letters/{id}
+        //====================================================
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
+        public IActionResult Delete(
+            string id)
+        {
+
+            _service.DeleteLetter(id);
+
+
+            return Ok(
+                "Letter deleted"
             );
 
         }
