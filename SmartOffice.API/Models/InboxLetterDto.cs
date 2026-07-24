@@ -25,6 +25,9 @@
 
         public DateTime CreatedAt { get; set; }
 
+        // توضیحات گردش نامه
+        public string? Description { get; set; }
+
 
     }
 

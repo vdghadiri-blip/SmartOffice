@@ -222,6 +222,11 @@ namespace SmartOffice.API.Services
 
                         Status = item.Status,
 
+
+                        // توضیحات ارسال یا ارجاع
+                        Description = item.Description,
+
+
                         CreatedAt = item.CreatedAt
                     });
                 }
@@ -348,51 +353,114 @@ namespace SmartOffice.API.Services
 
 
         // Forward
+        //====================================================
+        // ارجاع (Forward) نامه
+        //
+        // وظایف:
+        //
+        // 1- ایجاد گردش جدید برای گیرنده جدید
+        // 2- ثبت توضیحات ارجاع
+        // 3- ثبت تاریخچه نامه
+        //
+        //====================================================
+
         public void ForwardLetter(
             ForwardLetterRequest request,
             string senderUsername)
         {
 
+
+            // ایجاد انتقال جدید نامه
+
             var transfer =
                 new LetterTransfer
                 {
+
+                    // شناسه انتقال
+
                     Id =
                     ObjectId.GenerateNewId().ToString(),
+
+
+
+                    // شناسه نامه اصلی
 
                     LetterId =
                     request.LetterId,
 
+
+
+                    // کاربر ارجاع دهنده
+
                     FromUserId =
                     senderUsername,
+
+
+
+                    // کاربر مقصد
 
                     ToUserId =
                     request.ReceiverUsername,
 
+
+
+                    // توضیحات ارجاع
+
                     Description =
                     request.Description,
+
+
+
+                    // وضعیت انتقال
 
                     Status =
                     "Forwarded",
 
+
+
+                    // تاریخ ارجاع
+
                     CreatedAt =
                     DateTime.UtcNow
+
                 };
 
 
+
+
+
+            // ذخیره گردش جدید
 
             _transfers.InsertOne(transfer);
 
 
 
+
+
+
+
+            // ثبت در تاریخچه نامه
+            //
+            // قبلاً متن ثابت بود:
+            //
+            // "ارجاع نامه"
+            //
+            // الان توضیح واقعی کاربر ذخیره می‌شود
+
             AddHistory(
+
                 request.LetterId,
+
                 senderUsername,
+
                 "Forward",
-                "ارجاع نامه"
+
+                request.Description
+
             );
 
-        }
 
+        }
 
 
 
