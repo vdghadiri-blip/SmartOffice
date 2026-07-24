@@ -6,16 +6,24 @@
  *
  ************************************************/
 
+
 import { apiSlice } from "../../../app/api/apiSlice";
+
 
 
 export const lettersApi = apiSlice.injectEndpoints({
 
+
     endpoints: (builder) => ({
 
 
+
         /********************************************
-         * دریافت همه نامه‌ها
+         *
+         * دریافت تمام نامه‌ها
+         *
+         * GET /api/Letters
+         *
          ********************************************/
         getLetters: builder.query({
 
@@ -27,10 +35,14 @@ export const lettersApi = apiSlice.injectEndpoints({
 
 
 
+
+
         /********************************************
-         * صندوق ورودی
+         *
+         * دریافت صندوق ورودی کاربر
          *
          * GET /api/Letters/inbox
+         *
          ********************************************/
         getInboxLetters: builder.query({
 
@@ -42,10 +54,14 @@ export const lettersApi = apiSlice.injectEndpoints({
 
 
 
+
+
         /********************************************
-         * نامه‌های ارسالی
+         *
+         * دریافت نامه‌های ارسال شده
          *
          * GET /api/Letters/sent
+         *
          ********************************************/
         getSentLetters: builder.query({
 
@@ -57,10 +73,14 @@ export const lettersApi = apiSlice.injectEndpoints({
 
 
 
+
+
         /********************************************
-         * تاریخچه نامه
+         *
+         * دریافت تاریخچه گردش نامه
          *
          * GET /api/Letters/history/{id}
+         *
          ********************************************/
         getLetterHistory: builder.query({
 
@@ -73,10 +93,14 @@ export const lettersApi = apiSlice.injectEndpoints({
 
 
 
+
+
         /********************************************
-         * خواندن نامه
+         *
+         * دریافت جزئیات یک نامه
          *
          * GET /api/Letters/read/{id}
+         *
          ********************************************/
         getLetter: builder.query({
 
@@ -89,10 +113,14 @@ export const lettersApi = apiSlice.injectEndpoints({
 
 
 
+
+
         /********************************************
-         * ارسال نامه
+         *
+         * ارسال نامه جدید
          *
          * POST /api/Letters/send
+         *
          ********************************************/
         sendLetter: builder.mutation({
 
@@ -106,29 +134,141 @@ export const lettersApi = apiSlice.injectEndpoints({
 
             }),
 
+
             invalidatesTags: ["Letters"],
 
         }),
 
 
+
+
+
+        /********************************************
+         *
+         * تغییر وضعیت نامه
+         *
+         * مثال:
+         *
+         * Unread  ---> Read
+         *
+         * POST /api/Letters/status
+         *
+         ********************************************/
+        updateLetterStatus: builder.mutation({
+
+            query: (data) => ({
+
+                url: "/Letters/status",
+
+                method: "POST",
+
+                body: data,
+
+            }),
+
+
+            invalidatesTags: ["Letters"],
+
+        }),
+
+
+
+
+
+        /********************************************
+         *
+         * ارجاع (Forward) نامه
+         *
+         * ارسال یک نامه موجود
+         * به کاربر دیگر
+         *
+         * POST /api/Letters/forward
+         *
+         ********************************************/
+        forwardLetter: builder.mutation({
+
+            query: (data) => ({
+
+                url: "/Letters/forward",
+
+                method: "POST",
+
+                body: data,
+
+            }),
+
+
+            invalidatesTags: ["Letters"],
+
+        }),
+
+
+
     }),
+
 
 
 });
 
 
+
+
+
+/************************************************
+ *
+ * خروجی Hook های مربوط به API نامه‌ها
+ *
+ ************************************************/
+
+
 export const {
+
+
+    // دریافت همه نامه‌ها
 
     useGetLettersQuery,
 
+
+
+    // دریافت صندوق ورودی
+
     useGetInboxLettersQuery,
+
+
+
+    // دریافت نامه‌های ارسال شده
 
     useGetSentLettersQuery,
 
+
+
+    // دریافت تاریخچه نامه
+
     useGetLetterHistoryQuery,
+
+
+
+    // دریافت جزئیات نامه
 
     useGetLetterQuery,
 
+
+
+    // ارسال نامه جدید
+
     useSendLetterMutation,
+
+
+
+    // تغییر وضعیت نامه
+
+    useUpdateLetterStatusMutation,
+
+
+
+    // ارجاع (Forward) نامه
+
+    useForwardLetterMutation,
+
 
 } = lettersApi;

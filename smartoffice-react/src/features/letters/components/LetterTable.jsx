@@ -2,11 +2,24 @@ import {
     DataGrid
 } from "@mui/x-data-grid";
 
+import {
+    Button
+} from "@mui/material";
+
+import {
+    useNavigate
+} from "react-router-dom";
+
+
 
 function LetterTable({
     rows = [],
     loading = false
 }) {
+
+
+    const navigate = useNavigate();
+
 
 
     const columns = [
@@ -57,6 +70,37 @@ function LetterTable({
                 : "",
         },
 
+
+        // ستون جدید
+        {
+            field: "action",
+            headerName: "عملیات",
+            width: 120,
+
+            sortable: false,
+
+            renderCell: (params) => (
+
+                <Button
+
+                    variant="contained"
+
+                    size="small"
+
+                    onClick={() =>
+                        navigate(`/letters/${params.row.id}`)
+                    }
+
+                >
+                    مشاهده
+
+                </Button>
+
+            )
+
+        },
+
+
     ];
 
 
@@ -83,11 +127,17 @@ function LetterTable({
                 pageSizeOptions={[5,10,20]}
 
                 initialState={{
+
                     pagination:{
+
                         paginationModel:{
+
                             pageSize:10,
+
                         }
+
                     }
+
                 }}
 
             />
